@@ -13,7 +13,9 @@ curl -q https://codeload.github.com/magento/magento2/tar.gz/$VERSION \
     -o $VERSION.tar.gz &&
         
 tar -xzf $VERSION.tar.gz -C src/www \
-    --strip-components=1
+    --strip-components=1 \
+    
+rm -rf $VERSION.tar.gz
 
 ```
 
@@ -24,6 +26,33 @@ docker run  -i -d -p 80:80  \
             -v src:/www     \
             --name magento  \
             appsoa/docker-centos-webapp-magento:latest
+```
+
+### Install Google Cloud SDK
+```sh
+curl https://sdk.cloud.google.com | bash
+exec -l zsh 
+
+gcloud config set compute/zone us-central1-a && 
+
+gcloud components   install -q  \
+                    beta        \
+                    kubectl     \
+                    docker-credential-gcr &&
+                    
+gcloud auth activate-service-account \
+            sandbox-01@hale-proposal-159523.iam.gserviceaccount.com \
+            --key-file service_account.json &&
+            
+gcloud auth application-default login 
+
+gcloud  container \ 
+        clusters \
+        get-credentials \
+        cluster-1 &&
+        
+kubectl get svc
+
 ```
 
 ### Create persistent disk in Google Cloud Platform
