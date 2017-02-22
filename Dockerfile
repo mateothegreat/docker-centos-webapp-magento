@@ -27,24 +27,28 @@ COPY /entrypoint.d/* /entrypoint.d/
 # Download Magento2.x.x source from github & extract to disk.
 #
 # WORKDIR /magento
-RUN curl https://codeload.github.com/magento/magento2/tar.gz/$MAGENTO_VERSION -o $FILE_NAME.tar.gz && \
+RUN mkdir /magento && \
+    curl https://codeload.github.com/magento/magento2/tar.gz/$MAGENTO_VERSION -o $FILE_NAME.tar.gz && \
 # RUN wget https://codeload.github.com/magento/magento2/tar.gz/$MAGENTO_VERSION -o $FILE_NAME.tar.gz && \
-    tar -xzf $FILE_NAME.tar.gz -C /www  --strip-components=1 && \
+    tar -xzf $FILE_NAME.tar.gz -C /magento  --strip-components=1 && \
     # tar -xzvf $FILE_NAME.tar.gz && \
     # ls /magento && \
     # rm -rf $FILE_NAME.tar.gz && \
     # mv $FILE_NAME /www && \
     # cp -R $FILE_NAME /www && \
-    chown -R nginx:nginx /www
+    cp -R -f /magento/{*,*.*} /www/ && \
+    chown -R nginx:nginx /www && \
+    rm -rf /magento 
 
 #
 # Install php libraries with composer.
 #
 USER nginx
-# RUN composer install
+WORKDIR /www
+RUN composer install
 
 EXPOSE 80
 
-USER root
+# USER root
 WORKDIR /
 ENTRYPOINT ["/entrypoint.sh"]
